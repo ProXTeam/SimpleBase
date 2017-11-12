@@ -1,5 +1,8 @@
 # BasicStruct
 
+Basic project structure swift 4.0
+
+
 Command pod 
 
   pod 'Kingfisher'
