@@ -103,12 +103,16 @@ class Downloader: NSObject, URLSessionDownloadDelegate {
         
         if fileManager.fileExists(atPath: saveUrl){
             print("file already downloaded")
+             self.completionBlock?("File downloaded before")
+            return
         }else{
             //save file
             do {
                 try fileManager.moveItem(at: location, to: path)
             }catch{
                 print("Save file error: \(error.localizedDescription)")
+                self.completionBlock?("File save error \(error.localizedDescription)")
+                return
             }
         }
         

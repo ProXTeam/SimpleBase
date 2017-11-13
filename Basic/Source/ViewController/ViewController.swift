@@ -12,8 +12,8 @@ import PKHUD
 class ViewController: UIViewController {
 
     @IBOutlet var lbProgress:UILabel!
-    var downloadStatus = DownloadStatus.notYet
-    let dl = Downloader()
+    private var downloadStatus = DownloadStatus.notYet
+    private let dl = Downloader()
     
     override func viewDidLoad() {
         super.viewDidLoad()
