@@ -15,13 +15,28 @@ target 'Basic' do
 #   pod 'GPUImage'
     pod 'Kingfisher'
     pod 'AlamofireObjectMapper'
-    pod 'RealmSwift'
+#    pod 'RealmSwift'
     pod 'SnapKit'
 #    pod 'Zip'
 #    pod "XCDYouTubeKit", "~> 2.5"
 #    pod 'HCSStarRatingView'
     pod 'PagingKit'
     pod 'PKHUD'
+    
+    
+    #Facebok
+    pod 'FBSDKCoreKit'
+    #pod 'FBSDKShareKit'
+    pod 'FBSDKLoginKit'
+    pod 'FacebookCore'
+    pod 'FacebookLogin'
+    #pod 'AccountKit'
+    
+    #Google
+    pod 'Firebase'
+    pod 'FirebaseAuth'
+    pod 'FirebaseDatabase'
+    pod 'GoogleSignIn'
 
   target 'BasicUITests' do
     inherit! :search_paths

@@ -14,6 +14,10 @@ class LoadingTVCell: UITableViewCell {
     
     @IBOutlet var indicator:UIActivityIndicatorView!
 
-    
+    override func awakeFromNib() {
+        
+        
+        
+    }
 
 }

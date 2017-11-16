@@ -35,6 +35,9 @@
 		DC194D181FB8DF3C000E0685 /* Pager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DC194D171FB8DF3C000E0685 /* Pager.storyboard */; };
 		DC194D1C1FB8DF7B000E0685 /* ContentTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC194D1A1FB8DF7B000E0685 /* ContentTableViewController.swift */; };
 		DC194D1E1FB8DF8A000E0685 /* ContentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC194D1D1FB8DF8A000E0685 /* ContentTableViewCell.swift */; };
+		DC510B3C1FBD8093006DFA2F /* FacebookManage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC510B391FBD8092006DFA2F /* FacebookManage.swift */; };
+		DC510B3D1FBD8093006DFA2F /* FacebookAccountKitManage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC510B3A1FBD8092006DFA2F /* FacebookAccountKitManage.swift */; };
+		DC510B3E1FBD8093006DFA2F /* GoogleManage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC510B3B1FBD8092006DFA2F /* GoogleManage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +97,9 @@
 		DC194D171FB8DF3C000E0685 /* Pager.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Pager.storyboard; sourceTree = "<group>"; };
 		DC194D1A1FB8DF7B000E0685 /* ContentTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentTableViewController.swift; sourceTree = "<group>"; };
 		DC194D1D1FB8DF8A000E0685 /* ContentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentTableViewCell.swift; sourceTree = "<group>"; };
+		DC510B391FBD8092006DFA2F /* FacebookManage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FacebookManage.swift; sourceTree = "<group>"; };
+		DC510B3A1FBD8092006DFA2F /* FacebookAccountKitManage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FacebookAccountKitManage.swift; sourceTree = "<group>"; };
+		DC510B3B1FBD8092006DFA2F /* GoogleManage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoogleManage.swift; sourceTree = "<group>"; };
 		DFB9734D3434708C640AFB00 /* Pods-Basic.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Basic.release.xcconfig"; path = "Pods/Target Support Files/Pods-Basic/Pods-Basic.release.xcconfig"; sourceTree = "<group>"; };
 		F22D4B109CF6B6AC46FF9A24 /* Pods-BasicUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BasicUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-BasicUITests/Pods-BasicUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -229,6 +235,9 @@
 		DC194CF01FB8D0F3000E0685 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				DC510B3A1FBD8092006DFA2F /* FacebookAccountKitManage.swift */,
+				DC510B391FBD8092006DFA2F /* FacebookManage.swift */,
+				DC510B3B1FBD8092006DFA2F /* GoogleManage.swift */,
 				DC194CFA1FB8D261000E0685 /* Utility.swift */,
 				DC194D021FB8D6BB000E0685 /* Downloader.swift */,
 				DC194CFE1FB8D422000E0685 /* Validate.swift */,
@@ -354,7 +363,7 @@
 				TargetAttributes = {
 					DC194CBC1FB8CEF0000E0685 = {
 						CreatedOnToolsVersion = 9.1;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					DC194CD01FB8CEF0000E0685 = {
 						CreatedOnToolsVersion = 9.1;
@@ -593,12 +602,15 @@
 			files = (
 				DC194D161FB8DF2B000E0685 /* SimpleViewController.swift in Sources */,
 				DC194CFB1FB8D261000E0685 /* Utility.swift in Sources */,
+				DC510B3C1FBD8093006DFA2F /* FacebookManage.swift in Sources */,
 				DC194CF51FB8D0F3000E0685 /* ViewController.swift in Sources */,
 				DC194D131FB8DEFE000E0685 /* MenuCell.swift in Sources */,
+				DC510B3E1FBD8093006DFA2F /* GoogleManage.swift in Sources */,
 				DC194D0B1FB8D749000E0685 /* SongTableViewCell.swift in Sources */,
 				DC194D031FB8D6BB000E0685 /* Downloader.swift in Sources */,
 				DC194CFF1FB8D422000E0685 /* Validate.swift in Sources */,
 				DC194CC11FB8CEF0000E0685 /* AppDelegate.swift in Sources */,
+				DC510B3D1FBD8093006DFA2F /* FacebookAccountKitManage.swift in Sources */,
 				DC194D1C1FB8DF7B000E0685 /* ContentTableViewController.swift in Sources */,
 				DC194D0D1FB8D7A0000E0685 /* SearchYoutubeVC.swift in Sources */,
 				DC194CFD1FB8D297000E0685 /* Youtube.swift in Sources */,
@@ -772,11 +784,14 @@
 			baseConfigurationReference = 9EAC673AA05F3842504B89D3 /* Pods-Basic.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = H5U672V2X2;
 				INFOPLIST_FILE = Basic/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.smartmedia.Basic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "7dcd0b42-146b-453e-86f5-d2d0f664d447";
+				PROVISIONING_PROFILE_SPECIFIER = "development all";
 				SWIFT_OBJC_BRIDGING_HEADER = BridgingHeader.h;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -788,11 +803,14 @@
 			baseConfigurationReference = DFB9734D3434708C640AFB00 /* Pods-Basic.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = H5U672V2X2;
 				INFOPLIST_FILE = Basic/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.smartmedia.Basic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "7dcd0b42-146b-453e-86f5-d2d0f664d447";
+				PROVISIONING_PROFILE_SPECIFIER = "development all";
 				SWIFT_OBJC_BRIDGING_HEADER = BridgingHeader.h;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

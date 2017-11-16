@@ -153,6 +153,12 @@ extension SearchYoutubeVC: UITableViewDataSource {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "loadingCell", for: indexPath) as! LoadingTVCell
             cell.indicator.startAnimating()
+            
+//            let vc = UIStoryboard(name: "Pager", bundle: nil).instantiateViewController(withIdentifier: "pageVC") as! SimpleViewController
+//            self.addChildViewController(vc)
+//            cell.addSubview(vc.view)
+            
+            
             return cell
             
         }
@@ -172,6 +178,16 @@ extension SearchYoutubeVC: UITableViewDataSource {
 
 extension SearchYoutubeVC:UITableViewDelegate {
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+//        if indexPath.section == 1{
+//            return 500
+//        }
+        
+        return 80
+        
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         let offsetY = scrollView.contentOffset.y
@@ -181,7 +197,7 @@ extension SearchYoutubeVC:UITableViewDelegate {
             
             if !isFull && !isLoading{
                 
-                searchRequest()
+//                searchRequest()
                 
             }
             

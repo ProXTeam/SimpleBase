@@ -61,6 +61,7 @@ class ViewController: UIViewController {
         
         let vc = UIStoryboard(name: "Pager", bundle: nil).instantiateViewController(withIdentifier: "pageVC") as! SimpleViewController
         self.navigationController?.pushViewController(vc, animated: true)
+//        TestRequest.testRequest()
         
     }
 
