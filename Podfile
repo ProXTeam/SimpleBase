@@ -30,7 +30,7 @@ target 'Basic' do
     pod 'FBSDKLoginKit'
     pod 'FacebookCore'
     pod 'FacebookLogin'
-    #pod 'AccountKit'
+    pod 'AccountKit'
     
     #Google
     pod 'Firebase'

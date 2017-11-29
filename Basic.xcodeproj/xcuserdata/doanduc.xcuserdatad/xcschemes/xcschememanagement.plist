@@ -7,7 +7,25 @@
 		<key>Basic.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>12</integer>
+			<integer>20</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>DC194CBC1FB8CEF0000E0685</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>DC194CD01FB8CEF0000E0685</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>DC194CDB1FB8CEF0000E0685</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
