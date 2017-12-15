@@ -844,7 +844,7 @@
 				DEVELOPMENT_TEAM = H5U672V2X2;
 				INFOPLIST_FILE = Basic/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.smartmedia.Basic;
+				PRODUCT_BUNDLE_IDENTIFIER = com.smj.karaoke;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "7dcd0b42-146b-453e-86f5-d2d0f664d447";
 				PROVISIONING_PROFILE_SPECIFIER = "development all";
@@ -859,14 +859,15 @@
 			baseConfigurationReference = DFB9734D3434708C640AFB00 /* Pods-Basic.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = H5U672V2X2;
+				DEVELOPMENT_TEAM = 22D8GEVJ4K;
 				INFOPLIST_FILE = Basic/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.smartmedia.Basic;
+				PRODUCT_BUNDLE_IDENTIFIER = com.smj.karaoke;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "7dcd0b42-146b-453e-86f5-d2d0f664d447";
-				PROVISIONING_PROFILE_SPECIFIER = "development all";
+				PROVISIONING_PROFILE = "f76bdf08-70a8-43cd-a07c-29f1e0703b12";
+				PROVISIONING_PROFILE_SPECIFIER = "Kara Dis Universal";
 				SWIFT_OBJC_BRIDGING_HEADER = BridgingHeader.h;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
