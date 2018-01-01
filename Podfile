@@ -25,18 +25,20 @@ target 'Basic' do
     
     
     #Facebok
-    pod 'FBSDKCoreKit'
-    #pod 'FBSDKShareKit'
-    pod 'FBSDKLoginKit'
-    pod 'FacebookCore'
-    pod 'FacebookLogin'
-    pod 'AccountKit'
-    
+#    pod 'FBSDKCoreKit'
+#    #pod 'FBSDKShareKit'
+#    pod 'FBSDKLoginKit'
+#    pod 'FacebookCore'
+#    pod 'FacebookLogin'
+#    pod 'AccountKit'
+
     #Google
-    pod 'Firebase'
-    pod 'FirebaseAuth'
-    pod 'FirebaseDatabase'
-    pod 'GoogleSignIn'
+#    pod 'Firebase'
+#    pod 'FirebaseAuth'
+#    pod 'FirebaseDatabase'
+#    pod 'GoogleSignIn'
+    
+    pod 'Localize-Swift'
 
   target 'BasicUITests' do
     inherit! :search_paths

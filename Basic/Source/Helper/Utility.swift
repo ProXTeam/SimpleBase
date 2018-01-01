@@ -12,89 +12,6 @@ import UIKit
 
 class Utility: NSObject {
     
-    //MARK: - File manager
-
-    class func createDir(dirName: String) {
-        
-        print("creat folder:",dirName)
-        
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let dataPath = documentsDirectory.appendingPathComponent(dirName)
-        
-        let fileManager = FileManager.default
-        var isDir : ObjCBool = false
-        if fileManager.fileExists(atPath: dataPath.path, isDirectory:&isDir) {
-            if isDir.boolValue {
-                // file exists and is a directory
-                print("file exist")
-            } else {
-                // file exists and is not a directory
-                print("folder exist")
-            }
-        } else {
-            // folder does not exist
-            do {
-                try FileManager.default.createDirectory(atPath: dataPath.path, withIntermediateDirectories: false, attributes: nil)
-            } catch let error as NSError {
-                print("Error creating directory: \(error.localizedDescription)")
-            }
-        }
-        
-
-    }
-    
-    class func deleteFile(fileName:String){
-        
-        let filePath = FileManager.default.urls(for: .documentDirectory,in: .userDomainMask)[0].appendingPathComponent(fileName)
-        
-        print("delete", filePath)
-        
-        let fileManager = FileManager.default
-        do {
-            try fileManager.removeItem(atPath: filePath.path)
-        } catch {
-            print("Failed to delete file.", error.localizedDescription)
-        }
-        
-    }
-    
-    
-    class func checkFileExist(fileName:String)->(Bool){
-        
-        
-        let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as String
-        let url = NSURL(fileURLWithPath: path)
-        let filePath = url.appendingPathComponent(fileName)?.path
-        
-//        print(filePath!);
-        let fileManager = FileManager.default
-        if fileManager.fileExists(atPath: filePath!) {
-            print("File availble <--", fileName)
-            return true;
-        } else {
-            print("File not availble <--", fileName)
-            return false;
-        }
-        
-    }
-
-    class func getDocumentsDirectory() -> URL {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let documentsDirectory = paths[0]
-        return documentsDirectory
-    }
-    
-    class func getFileExtension(file:String)->String{
-        
-        if let fileExtension = NSURL(fileURLWithPath: file).pathExtension {
-            print("fileExtension: ",fileExtension)
-            return fileExtension
-        }
-        
-        return ""
-        
-    }
-    
     //MARK: - Other
     
     class var currentTimestamp: String {
@@ -140,72 +57,7 @@ class Utility: NSObject {
     
 }
 
-//MARK: Quick register nib
 
-extension UITableView{
-    
-    func registerNib(_ nibClass:AnyClass, _ identifier:String){
-        
-        let nib = UINib(nibName: String(describing: nibClass.self), bundle: nil)
-        self.register(nib, forCellReuseIdentifier: identifier)
-        
-    }
-    
-}
-
-extension UICollectionView{
-    
-    func registerNib(_ nibClass:AnyClass, _ identifier:String){
-        
-        let nib = UINib(nibName: String(describing: nibClass.self), bundle: nil)
-        self.register(nib, forCellWithReuseIdentifier: identifier)
-        
-    }
-    
-}
-
-//MARK: Image from color
-
-extension UIColor {
-    
-    convenience init(_  red: Int,_  green: Int,_ blue: Int) {
-        let newRed = CGFloat(red)/255
-        let newGreen = CGFloat(green)/255
-        let newBlue = CGFloat(blue)/255
-        
-        self.init(red: newRed, green: newGreen, blue: newBlue, alpha: 1.0)
-    }
-    
-    convenience init(_ red: Int,_ green: Int,_ blue: Int,_ alpha: Int) {
-        let newRed = CGFloat(red)/255
-        let newGreen = CGFloat(green)/255
-        let newBlue = CGFloat(blue)/255
-        let newAlpha = CGFloat(alpha)/1
-        self.init(red: newRed, green: newGreen, blue: newBlue, alpha: newAlpha)
-    }
-    
-    convenience init(hex: String) {
-        let scanner = Scanner(string: hex)
-        scanner.scanLocation = 0
-        var rgbValue: UInt64 = 0
-        scanner.scanHexInt64(&rgbValue)
-        let r = (rgbValue & 0xff0000) >> 16
-        let g = (rgbValue & 0xff00) >> 8
-        let b = rgbValue & 0xff
-        self.init(red: CGFloat(r) / 0xff, green: CGFloat(g) / 0xff, blue: CGFloat(b) / 0xff, alpha: 1.0)
-    }
-    
-    var toHexString: String {
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        self.getRed(&r, green: &g, blue: &b, alpha: &a)
-        // return
-        return String(format: "%02X%02X%02X", Int(r * 0xff), Int(g * 0xff), Int(b * 0xff))
-    }
-    
-}
 
 extension UIImage {
     
@@ -258,36 +110,7 @@ extension UIImage {
 }
 
 extension String {
-    
-    var length: Int {
-        return self.count
-    }
 
-    subscript (i: Int) -> String {
-        return self[Range(i ..< i + 1)]
-    }
-    
-    func substring(from: Int) -> String {
-        return self[Range(min(from, length) ..< length)]
-    }
-    
-    func substring(to: Int) -> String {
-        return self[Range(0 ..< max(0, to))]
-    }
-    
-    subscript (r: Range<Int>) -> String {
-        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
-                                            upper: min(length, max(0, r.upperBound))))
-        let start = index(startIndex, offsetBy: range.lowerBound)
-        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
-        return String(self[Range(start ..< end)])
-    }
-    
-    func versionToInt() -> [Int] {
-        return self.components(separatedBy: ".")
-            .map { Int.init($0) ?? 0 }
-    }
-    
     
     func md5() -> String! {
         let context = UnsafeMutablePointer<CC_MD5_CTX>.allocate(capacity: 1)
@@ -304,13 +127,6 @@ extension String {
         return hexString
     }
     
-}
-
-extension UIView {
-    
-    class func fromNib<T: UIView>() -> T? {
-        return Bundle.main.loadNibNamed(String(describing: self), owner: nil, options: nil)?.first as? T
-    }
 }
 
 

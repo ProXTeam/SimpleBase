@@ -87,14 +87,14 @@ class Downloader: NSObject, URLSessionDownloadDelegate {
             }
         }
         
-        let doc = Utility.getDocumentsDirectory()
+        let doc = FileMg.getDocumentsDirectory()
         let path = doc.appendingPathComponent(saveUrl)
         
         if saveUrl.contains("/"){
             
             let parts = saveUrl.components(separatedBy: "/")
             let doc = parts.first
-            Utility.createDir(dirName: doc!)
+            FileMg.createDir(dirName: doc!)
             
         }
         

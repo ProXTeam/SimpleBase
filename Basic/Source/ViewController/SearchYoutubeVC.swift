@@ -27,7 +27,7 @@ class SearchYoutubeVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.registerNib(LoadingTVCell.self, idLoadingCell)
+        tableView.register(LoadingTVCell.self, forCellReuseIdentifier: kLoadingCellId)
         tableView.registerNib(SongTableViewCell.self, idSongCell)
         
         tableView.tableFooterView = UIView(frame: .zero)
