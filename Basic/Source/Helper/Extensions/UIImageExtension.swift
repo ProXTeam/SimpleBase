@@ -33,7 +33,7 @@ public extension UIImage {
      Reference at https://github.com/cosnovae/fixUIImageOrientation/blob/master/fixImageOrientation.swift
      */
     class func fixImageOrientation(_ src: UIImage) -> UIImage {
-        if src.imageOrientation == UIImageOrientation.up {
+        if src.imageOrientation == UIImage.Orientation.up {
             return src
         }
         
@@ -54,6 +54,8 @@ public extension UIImage {
             break
         case UIImageOrientation.up, UIImageOrientation.upMirrored:
             break
+        @unknown default:
+            break
         }
         
         switch src.imageOrientation {
@@ -65,6 +67,8 @@ public extension UIImage {
             transform.translatedBy(x: src.size.height, y: 0)
             transform.scaledBy(x: -1, y: 1)
         case UIImageOrientation.up, UIImageOrientation.down, UIImageOrientation.left, UIImageOrientation.right:
+            break
+        @unknown default:
             break
         }
         
@@ -88,7 +92,7 @@ public extension UIImage {
     }
     
     // https://github.com/melvitax/AFImageHelper/blob/master/AFImageHelper%2FAFImageExtension.swift
-    public enum UIImageContentMode {
+    enum UIImageContentMode {
         case scaleToFill, scaleAspectFit, scaleAspectFill
     }
     
@@ -226,7 +230,7 @@ public extension UIImage {
         return cropped
     }
     
-    public func imageRotatedByDegrees(_ degrees: CGFloat, flip: Bool) -> UIImage {
+    func imageRotatedByDegrees(_ degrees: CGFloat, flip: Bool) -> UIImage {
         /*
          let radiansToDegrees: (CGFloat) -> CGFloat = {
          return $0 * (180.0 / CGFloat(M_PI))
@@ -269,7 +273,7 @@ public extension UIImage {
         return newImage!
     }
     
-    public func crop43() -> UIImage {
+    func crop43() -> UIImage {
         if self.size.width / self.size.height >= 0.75 {
             return self.cropToBounds(self, width: Double(self.size.height * 4 / 3), height: Double(self.size.height))
         } else {
@@ -305,8 +309,8 @@ extension UIImage {
         UIGraphicsBeginImageContextWithOptions(self.size, false, scale)
         
         let textFontAttributes = [
-            NSAttributedStringKey.font: textFont,
-            NSAttributedStringKey.foregroundColor: textColor]
+            NSAttributedString.Key.font: textFont,
+            NSAttributedString.Key.foregroundColor: textColor]
         self.draw(in: CGRect(origin: CGPoint.zero, size: self.size))
         let point = CGPoint(x: 20, y: self.size.height - 90)
         let rect = CGRect(origin: point, size: self.size)

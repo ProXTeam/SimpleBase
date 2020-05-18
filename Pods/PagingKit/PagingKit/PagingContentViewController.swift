@@ -132,7 +132,15 @@ public class PagingContentViewController: UIViewController {
     fileprivate var leftSidePageIndex = 0
     fileprivate var numberOfPages: Int = 0
     fileprivate var explicitPaging: ExplicitPaging?
+    
+    /// The ratio at which the origin of the left side content is offset from the origin of the page.
+    private var leftSidePagingPercent: CGFloat {
+        let rawPagingPercent = scrollView.contentOffset.x.truncatingRemainder(dividingBy: scrollView.bounds.width) / scrollView.bounds.width
+        return rawPagingPercent
+    }
 
+    var appearanceHandler: ContentsAppearanceHandlerProtocol = ContentsAppearanceHandler()
+    
     /// The object that acts as the delegate of the content view controller.
     public weak var delegate: PagingContentViewControllerDelegate?
     
@@ -145,34 +153,42 @@ public class PagingContentViewController: UIViewController {
     public var contentOffsetRatio: CGFloat {
         return scrollView.contentOffset.x / (scrollView.contentSize.width - scrollView.bounds.width)
     }
-
-    /// The ratio at which the origin of the left side content is offset from the origin of the page.
-    public var pagingPercent: CGFloat {
-        return scrollView.contentOffset.x.truncatingRemainder(dividingBy: scrollView.bounds.width) / scrollView.bounds.width
-    }
     
     /// The index at which the view controller is showing.
     public var currentPageIndex: Int {
-        let scrollToRightSide = (pagingPercent > 0.5)
-        let rightSidePageIndex = min(cachedViewControllers.endIndex, leftSidePageIndex + 1)
-        return scrollToRightSide ? rightSidePageIndex : leftSidePageIndex
+        return calcCurrentPageIndex(from: leftSidePageIndex, pagingPercent: leftSidePagingPercent)
+    }
+    
+    public var currentPagingPercent: CGFloat {
+        return calcCurrentPagingPercent(leftSidePagingPercent)
+    }
+    
+    
+    /// previsous or next focusing index
+    public var adjucentPageIndex: Int {
+        let percent = calcCurrentPagingPercent(leftSidePagingPercent)
+        return percent < 0 ? currentPageIndex - 1 : currentPageIndex + 1
     }
     
     ///  Reloads the content of the view controller.
     ///
     /// - Parameter page: An index to show after reloading.
-    public func reloadData(with page: Int = 0, completion: (() -> Void)? = nil) {
+    public func reloadData(with page: Int? = nil, completion: (() -> Void)? = nil) {
         removeAll()
-        initialLoad(with: page)
-        UIView.animate(
-            withDuration: 0,
-            animations: { [weak self] in
+        appearanceHandler.preReload(at: leftSidePageIndex)
+        let preferredPage = page ?? leftSidePageIndex
+        leftSidePageIndex = preferredPage
+        initialLoad(with: preferredPage)
+        UIView.pk.catchLayoutCompletion(
+            layout: { [weak self] in
                 self?.view.setNeedsLayout()
                 self?.view.layoutIfNeeded()
             },
-            completion: { [weak self] (finish) in
-                self?.scroll(to: page, animated: false)
-                completion?()
+            completion: { [weak self] _ in
+                self?.scroll(to: preferredPage, needsCallAppearance: false, animated: false) { _ in
+                    self?.appearanceHandler.postReload(at: preferredPage)
+                    completion?()
+                }
             }
         )
     }
@@ -182,24 +198,39 @@ public class PagingContentViewController: UIViewController {
     /// - Parameters:
     ///   - page: A index defining an content of the content view controller.
     ///   - animated: true if the scrolling should be animated, false if it should be immediate.
-    public func scroll(to page: Int, animated: Bool) {
+    public func scroll(to page: Int, animated: Bool, completion: ((Bool) -> Void)? = nil) {
+        scroll(to: page, needsCallAppearance: true, animated: animated, completion: completion)
+    }
+    
+    
+    private func scroll(to page: Int, needsCallAppearance: Bool, animated: Bool, completion: ((Bool) -> Void)? = nil) {
         delegate?.contentViewController(viewController: self, willBeginPagingAt: leftSidePageIndex, animated: animated)
+        
+        if needsCallAppearance {
+            appearanceHandler.beginDragging(at: leftSidePageIndex)
+        }
         
         loadPagesIfNeeded(page: page)
         leftSidePageIndex = page
         
         delegate?.contentViewController(viewController: self, willFinishPagingAt: leftSidePageIndex, animated: animated)
-        scroll(to: page, animated: animated) { [weak self] (finished) in
+        move(to: page, animated: animated) { [weak self] (finished) in
             guard let _self = self, finished else { return }
+            
+            if needsCallAppearance {
+                _self.appearanceHandler.stopScrolling(at: _self.leftSidePageIndex)
+            }
+            
+            completion?(finished)
             _self.delegate?.contentViewController(viewController: _self, didFinishPagingAt: _self.leftSidePageIndex, animated: animated)
         }
     }
     
-    private func scroll(to page: Int, animated: Bool, completion: @escaping (Bool) -> Void) {
+    private func move(to page: Int, animated: Bool, completion: @escaping (Bool) -> Void) {
         let offsetX = scrollView.bounds.width * CGFloat(page)
         if animated {
             stopScrolling()
-            performSystemAnimation(
+            UIView.pk.performSystemAnimation(
                 { [weak self] in
                     self?.scrollView.contentOffset = CGPoint(x: offsetX, y: 0)
                 },
@@ -208,8 +239,14 @@ public class PagingContentViewController: UIViewController {
                 }
             )
         } else {
-            scrollView.contentOffset = CGPoint(x: offsetX, y: 0)
-            completion(true)
+            UIView.pk.catchLayoutCompletion(
+                layout: { [weak self] in
+                    self?.scrollView.contentOffset = CGPoint(x: offsetX, y: 0)
+                },
+                completion: { _ in
+                    completion(true)
+                }
+            )
         }
     }
     
@@ -246,6 +283,30 @@ public class PagingContentViewController: UIViewController {
         view.addSubview(scrollView)
         view.addConstraints([.top, .bottom, .leading, .trailing].anchor(from: scrollView, to: view))
         view.backgroundColor = .clear
+        
+        appearanceHandler.contentsDequeueHandler = { [weak self] in
+            self?.cachedViewControllers
+        }
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        appearanceHandler.callApparance(.viewWillAppear, animated: animated, at: leftSidePageIndex)
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        appearanceHandler.callApparance(.viewDidAppear, animated: animated, at: leftSidePageIndex)
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        appearanceHandler.callApparance(.viewWillDisappear, animated: animated, at: leftSidePageIndex)
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        appearanceHandler.callApparance(.viewDidDisappear, animated: animated, at: leftSidePageIndex)
     }
 
     override public func viewDidLayoutSubviews() {
@@ -268,19 +329,22 @@ public class PagingContentViewController: UIViewController {
     }
 
     override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        removeAll()
-        initialLoad(with: leftSidePageIndex)
         coordinator.animate(alongsideTransition: { [weak self] (context) in
             guard let _self = self else { return }
-            _self.scroll(to: _self.leftSidePageIndex, animated: false)
+            _self.scroll(to: _self.leftSidePageIndex, needsCallAppearance: false, animated: false)
         }, completion: nil)
         
         super.viewWillTransition(to: size, with: coordinator)
     }
     
+    
+    public override var shouldAutomaticallyForwardAppearanceMethods: Bool {
+        return false
+    }
+    
     fileprivate func removeAll() {
         scrollView.subviews.forEach { $0.removeFromSuperview() }
-        childViewControllers.forEach { $0.removeFromParentViewController() }
+        children.forEach { $0.removeFromParent() }
     }
     
     fileprivate func initialLoad(with page: Int) {
@@ -297,11 +361,11 @@ public class PagingContentViewController: UIViewController {
         
         if case nil = cachedViewControllers[page], let dataSource = dataSource {
             let vc = dataSource.contentViewController(viewController: self, viewControllerAt: page)
-            addChildViewController(vc)
+            addChild(vc)
             vc.view.frame = scrollView.bounds
             vc.view.frame.origin.x = scrollView.bounds.width * CGFloat(page)
             scrollView.addSubview(vc.view)
-            vc.didMove(toParentViewController: self)
+            vc.didMove(toParent: self)
             cachedViewControllers[page] = vc
         }
     }
@@ -318,16 +382,45 @@ public class PagingContentViewController: UIViewController {
         scrollView.layer.removeAllAnimations()
         scrollView.setContentOffset(scrollView.contentOffset, animated: false)
     }
+    
+    /// calculates current page defined in PagingKit
+    ///
+    /// - Parameters:
+    ///   - leftSidePageIndex: page index showing on left side
+    ///   - pagingPercent: paging percent from left side index
+    /// - Returns: current focusing index
+    private func calcCurrentPageIndex(from leftSidePageIndex: Int, pagingPercent: CGFloat) -> Int {
+        let scrollToRightSide = (pagingPercent >= 0.5)
+        let rightSidePageIndex = min(cachedViewControllers.endIndex, leftSidePageIndex + 1)
+        return scrollToRightSide ? rightSidePageIndex : leftSidePageIndex
+    }
+    
+    /// calculate paging percent defined by PagingKit from left side paging percent
+    ///
+    /// - Parameter leftSidePagingPercent: left side paging percent
+    /// - Returns: paging parcent defined by PagingKit
+    fileprivate func calcCurrentPagingPercent(_ leftSidePagingPercent: CGFloat) -> CGFloat {
+        if leftSidePagingPercent >= 0.5 {
+            return (leftSidePagingPercent - 1)
+        } else {
+            return leftSidePagingPercent
+        }
+    }
 }
 
 // MARK:- UIScrollViewDelegate
 
 extension PagingContentViewController: UIScrollViewDelegate {
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        guard !(scrollView.isDragging && scrollView.isDecelerating) else {
+            return
+        }
+        
         explicitPaging = ExplicitPaging(oneTimeHandler: { [weak self, leftSidePageIndex = leftSidePageIndex] in
             guard let _self = self else { return }
             _self.delegate?.contentViewController(viewController: _self, willBeginPagingAt: leftSidePageIndex, animated: false)
             _self.explicitPaging?.start()
+            _self.appearanceHandler.beginDragging(at: leftSidePageIndex)
         })
         leftSidePageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
         delegate?.contentViewController(viewController: self, willBeginManualScrollOn: leftSidePageIndex)
@@ -337,8 +430,9 @@ extension PagingContentViewController: UIScrollViewDelegate {
         if let explicitPaging = explicitPaging {
             explicitPaging.fireOnetimeHandlerIfNeeded()
             leftSidePageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
-            let normalizedPercent = min(max(0, pagingPercent), 1)
-            delegate?.contentViewController(viewController: self, didManualScrollOn: leftSidePageIndex, percent: normalizedPercent)
+            let normalizedPercent = calcCurrentPagingPercent(leftSidePagingPercent)
+            let currentIndex = calcCurrentPageIndex(from: leftSidePageIndex, pagingPercent: leftSidePagingPercent)
+            delegate?.contentViewController(viewController: self, didManualScrollOn: currentIndex, percent: normalizedPercent)
         }
     }
     
@@ -349,11 +443,16 @@ extension PagingContentViewController: UIScrollViewDelegate {
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        // When scrollview is bouncing, touching the scrollview calls scrollViewDidEndDecelerating(_:) immediately. So this line guards the end process.
+        guard 0 <= scrollView.bounds.origin.x, scrollView.bounds.maxX <= scrollView.contentSize.width else { return }
+        
         if let explicitPaging = explicitPaging {
             leftSidePageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
             loadPagesIfNeeded()
             delegate?.contentViewController(viewController: self, didEndManualScrollOn: leftSidePageIndex)
             if explicitPaging.isPaging {
+                appearanceHandler.stopScrolling(at: leftSidePageIndex)
+
                 delegate?.contentViewController(viewController: self, didFinishPagingAt: leftSidePageIndex, animated: true)
             }
         }
@@ -368,22 +467,12 @@ extension PagingContentViewController: UIScrollViewDelegate {
             loadPagesIfNeeded()
             delegate?.contentViewController(viewController: self, didEndManualScrollOn: leftSidePageIndex)
             if explicitPaging.isPaging {
+                appearanceHandler.stopScrolling(at: leftSidePageIndex)
+                
                 delegate?.contentViewController(viewController: self, willFinishPagingAt: leftSidePageIndex, animated: false)
                 delegate?.contentViewController(viewController: self, didFinishPagingAt: leftSidePageIndex, animated: false)
             }
         }
         explicitPaging = nil
     }
-}
-
-// MARK:- Private top-level function
-
-private func performSystemAnimation(_ animations: @escaping () -> Void, completion: ((Bool) -> Void)? = nil) {
-    UIView.perform(
-        .delete,
-        on: [],
-        options: UIViewAnimationOptions(rawValue: 0),
-        animations: animations,
-        completion: completion
-    )
 }

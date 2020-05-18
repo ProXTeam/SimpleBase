@@ -41,10 +41,30 @@ public protocol PagingMenuViewControllerDelegate: class {
     ///   - page: An page number focusing the new selected menu in menu view controller.
     ///   - previousPage: An page number previously focusing menu in menu view controller.
     func menuViewController(viewController: PagingMenuViewController, didSelect page: Int, previousPage: Int)
+    
+    
+    /// Notifies the menu view controller that the frame of its focus view is about to change.
+    ///
+    /// - Parameters:
+    ///   - viewController: A menu view controller object informing the delegate.
+    ///   - index: end index
+    ///   - coordinator: animator coordinator
+    func menuViewController(viewController: PagingMenuViewController, willAnimateFocusViewTo index: Int, with coordinator: PagingMenuFocusViewAnimationCoordinator)
+    
+    /// Tells the delegate that the specified cell is about to be displayed in the menu view.
+    ///
+    /// - Parameters:
+    ///   - viewController: A menu view controller object informing the delegate.
+    ///   - cell: The cell object being added.
+    ///   - index: The index path of the data item that the cell represents.
+    func menuViewController(viewController: PagingMenuViewController, willDisplay cell: PagingMenuViewCell, forItemAt index: Int)
 }
 
 extension PagingMenuViewControllerDelegate {
     public func menuViewController(viewController: PagingMenuViewController, focusViewDidEndTransition focusView: PagingMenuFocusView) {}
+    
+    public func menuViewController(viewController: PagingMenuViewController, willAnimateFocusViewTo index: Int, with coordinator: PagingMenuFocusViewAnimationCoordinator) {}
+    public func menuViewController(viewController: PagingMenuViewController, willDisplay cell: PagingMenuViewCell, forItemAt index: Int) {}
 }
 
 /// The data source provides the paging menu view controller object with the information it needs to construct and modify the menus.
@@ -106,6 +126,16 @@ public class PagingMenuViewController: UIViewController {
         return menuView.contentOffset.x / menuView.contentSize.width
     }
     
+    /// If contentSize.width is not over safe area, paging menu view applys cellAlignment to each the cells. (default: .left)
+    public var cellAlignment: PagingMenuView.Alignment {
+        set {
+            menuView.cellAlignment = newValue
+        }
+        get {
+            return menuView.cellAlignment
+        }
+    }
+    
     /// The spacing to use between menus.
     public var cellSpacing: CGFloat {
         set {
@@ -113,6 +143,16 @@ public class PagingMenuViewController: UIViewController {
         }
         get {
             return menuView.cellSpacing
+        }
+    }
+    
+    /// The content inset to add padding
+    public var contentInset: UIEdgeInsets {
+        set {
+            menuView.contentInset = newValue
+        }
+        get {
+            return menuView.contentInset
         }
     }
 
@@ -123,8 +163,13 @@ public class PagingMenuViewController: UIViewController {
     ///   - percent: A rate that transit from the index.
     ///   - animated: true if the scrolling should be animated, false if it should be immediate.
     public func scroll(index: Int, percent: CGFloat = 0, animated: Bool = true) {
-        menuView.scroll(index: index, percent: percent, animated: animated)
-        if percent == 0 && !animated {
+        if animated {
+            menuView.scroll(index: index, completeHandler: { _ in })
+            return
+        }
+
+        menuView.scroll(index: index, percent: percent)
+        if percent == 0 {
             delegate?.menuViewController(viewController: self, focusViewDidEndTransition: menuView.focusView)
         }
     }
@@ -158,10 +203,7 @@ public class PagingMenuViewController: UIViewController {
     ///   - view: A view object to use focus view.
     ///   - isBehindCell: the focus view is placed behind the menus of menu view controller.
     public func registerFocusView(view: UIView, isBehindCell: Bool = false) {
-        menuView.focusView.addSubview(view)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        menuView.focusView.addConstraints([.top, .bottom, .leading, .trailing].anchor(from: view, to: menuView.focusView))
-        menuView.focusView.layer.zPosition = isBehindCell ? -1 : 0
+        menuView.registerFocusView(view: view, isBehindCell: isBehindCell)
     }
 
     /// Registers a nib that a menu view controller uses to focus each menu.
@@ -170,8 +212,7 @@ public class PagingMenuViewController: UIViewController {
     ///   - view: A nib object to use focus view.
     ///   - isBehindCell: the focus view is placed behind the menus of menu view controller.
     public func registerFocusView(nib: UINib, isBehindCell: Bool = false) {
-        let view = nib.instantiate(withOwner: self, options: nil).first as! UIView
-        registerFocusView(view: view, isBehindCell: isBehindCell)
+        menuView.registerFocusView(nib: nib, isBehindCell: isBehindCell)
     }
     
     /// Registers a nib object containing a cell with the menu view controller under a specified identifier.
@@ -209,19 +250,12 @@ public class PagingMenuViewController: UIViewController {
     ///   - completionHandler: The block to execute after the reloading finishes. This block has no return value and takes no parameters. You may specify nil for this parameter.
     public func reloadData(with preferredFocusIndex: Int? = nil, completionHandler: ((Bool) -> Void)? = nil) {
         let selectedIndex = preferredFocusIndex ?? currentFocusedIndex ?? 0
-        menuView.focusView.selectedIndex = selectedIndex
-        UIView.animate(
-            withDuration: 0,
-            animations: { [weak self] in
-                self?.menuView.reloadData()
-            },
-            completion: {  [weak self] (finish) in
-                guard let _self = self else { return }
-                let scrollIndex = selectedIndex
-                _self.scroll(index: scrollIndex, percent: 0, animated: false)
-                completionHandler?(finish)
-            }
-        )
+        fireInvalidateLayout = { [weak self] in
+            self?.menuView.reloadData(with: selectedIndex, completion: completionHandler)
+        }
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
     }
 
     /// Invalidates the current layout using the information in the provided context object.
@@ -284,10 +318,17 @@ extension PagingMenuViewController: UIScrollViewDelegate {
 // MARK:- PagingMenuViewDelegate
 
 extension PagingMenuViewController: PagingMenuViewDelegate {
+    public func pagingMenuView(pagingMenuView: PagingMenuView, willDisplay cell: PagingMenuViewCell, forItemAt index: Int) {
+        delegate?.menuViewController(viewController: self, willDisplay: cell, forItemAt: index)
+    }
+    
+    public func pagingMenuView(pagingMenuView: PagingMenuView, willAnimateFocusViewTo index: Int, with coordinator: PagingMenuFocusViewAnimationCoordinator) {
+        delegate?.menuViewController(viewController: self, willAnimateFocusViewTo: index, with: coordinator)
+    }
+    
     public func pagingMenuView(pagingMenuView: PagingMenuView, didSelectItemAt index: Int) {
-        guard menuView.focusView.selectedIndex != index else { return }
-        
         delegate?.menuViewController(viewController: self, didSelect: index, previousPage: menuView.focusView.selectedIndex ?? 0)
+        guard menuView.focusView.selectedIndex != index else { return }
         menuView.scroll(index: index) { [weak self] (finish) in
             guard let _self = self, finish else { return }
             _self.delegate?.menuViewController(viewController: _self, focusViewDidEndTransition: _self.menuView.focusView)

@@ -1,33 +1,34 @@
 PODS:
-  - Alamofire (4.5.1)
-  - AlamofireObjectMapper (5.0.0):
-    - Alamofire (~> 4.1)
-    - ObjectMapper (~> 3.0)
-  - Kingfisher (4.2.0)
-  - Localize-Swift (2.0.0)
-  - ObjectMapper (3.1.0)
-  - PagingKit (1.1.0)
-  - PKHUD (5.0.0)
-  - SnapKit (4.0.0)
+  - Kingfisher (5.14.0):
+    - Kingfisher/Core (= 5.14.0)
+  - Kingfisher/Core (5.14.0)
+  - Localize-Swift (3.1.0)
+  - PagingKit (1.12.0)
+  - PKHUD (5.3.0)
+  - SnapKit (5.0.1)
 
 DEPENDENCIES:
-  - AlamofireObjectMapper
   - Kingfisher
   - Localize-Swift
   - PagingKit
   - PKHUD
   - SnapKit
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Kingfisher
+    - Localize-Swift
+    - PagingKit
+    - PKHUD
+    - SnapKit
+
 SPEC CHECKSUMS:
-  Alamofire: 2d95912bf4c34f164fdfc335872e8c312acaea4a
-  AlamofireObjectMapper: 5fafc816351cbbc0d486611aaeba7461c0cbad49
-  Kingfisher: 9ee7e788d8ba07c3f21ce0d43f33cec310a4f781
-  Localize-Swift: c798ec9286494866f7068f85f7c71283ac5bdab4
-  ObjectMapper: 20505058f54e5c3ca69e1d6de9897d152a5369a6
-  PagingKit: 72a8a05c8bd23811c0ab6055360d941ff17a61f9
-  PKHUD: 3c001512c6e002091184197a8de7a20420786e3b
-  SnapKit: a42d492c16e80209130a3379f73596c3454b7694
+  Kingfisher: 7b64389a43139c903ec434788344c288217c792d
+  Localize-Swift: 4bed4f0ccac8be2ec3517ee359da80ba2adb0fae
+  PagingKit: 3aa34f2547edad4809da888d5fa1b930456753f0
+  PKHUD: 98f3e4bc904b9c916f1c5bb6d765365b5357291b
+  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
-PODFILE CHECKSUM: 4a8d823667c7b8d4e73de087f34b5aeeed725bb9
+PODFILE CHECKSUM: f0a508221bbb7dfa01c932050c357b60eac81300
 
-COCOAPODS: 1.3.1
+COCOAPODS: 1.9.1

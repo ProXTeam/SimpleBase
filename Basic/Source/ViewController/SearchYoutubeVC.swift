@@ -7,15 +7,13 @@
 //
 
 import UIKit
-import Alamofire
-import AlamofireObjectMapper
 
 class SearchYoutubeVC: UIViewController {
 
     @IBOutlet var tableView:UITableView!
     @IBOutlet var lbLog:UILabel!
     
-    private var listYoutube = [Youtube]()
+    private var listYoutube = [Items]()
     
     private var isLoading = false
     private var isFull = false
@@ -46,9 +44,10 @@ class SearchYoutubeVC: UIViewController {
     }
     
     
+    
     func searchRequest() {
         
-
+        
         if isLoading{
             return
         }
@@ -56,82 +55,55 @@ class SearchYoutubeVC: UIViewController {
         lbLog.isHidden = true
         isLoading = true
         
-        
-        let param:Parameters = [
-            "q":searchText,
-            "pageToken":pageToken,
-            "part":"snippet",
-            "type":"video",
-            "key":"AIzaSyCrIWZB791uaByRS58RUvH_0wfI81PJ_ys",
-            "maxResults":20,
-            "videoCategoryId":10]
-        print(param)
-        let url = "https://www.googleapis.com/youtube/v3/search"
-        print(url)
-        
-        
-        Alamofire.request(url, method: .get , parameters:param)
-            .responseObject { (response:DataResponse<ResponseYoutube>) in
+        MovieClient.shared.searchYoutube(searchText: searchText, pageToken: pageToken) { [weak self] result in
+            
+            guard let sSelf = self else { return }
+            sSelf.isLoading = false
+            
+            switch result {
+            case .success(let data):
                 
-                DispatchQueue.main.async {
-                    
-                    self.isLoading = false
-                    if self.pageToken.isEmpty {
-                        self.listYoutube.removeAll()
-                        self.tableView.reloadData()
-                    }
-                    
-                    guard  response.error == nil,
-                        let value = response.result.value,
-                        value.code != 0 else {
-                            
-                            let mes = response.error?.localizedDescription ?? response.result.value?.message ?? "unknow"
-                            self.lbLog.text = mes
-                            self.lbLog.isHidden = false
-                            
-                            self.isFull = true
-                            self.tableView.reloadData()
-                            return
-                            
-                    }
-                    
-                    if let records = value.items{
+                guard let videos = data?.items else {
+                    if let error = data?.error{
+                        sSelf.isFull = true
                         
-                        if records.count < 20 {
-                            self.isFull = true
-                        }
-                        
-                        self.pageToken = value.nextToken ?? ""
-                        self.listYoutube.append(contentsOf: records)
-                        self.tableView.reloadData()
-                        
+                        sSelf.lbLog.text = error.message
+                        sSelf.lbLog.isHidden = false
                     }
-                    
+                    return
                 }
+                print(videos.count)
+                sSelf.pageToken = data?.nextPageToken ?? ""
+                if sSelf.pageToken == "" || videos.count < 20{
+                    sSelf.isFull = true
+                }
+                sSelf.listYoutube.append(contentsOf: videos)
                 
+            case .failure(let error):
+                
+                sSelf.isFull = true
+                sSelf.lbLog.text = error.localizedDescription
+                sSelf.lbLog.isHidden = false
+                print("the error \(error)")
+            }
+            
+            sSelf.tableView.reloadData()
+            
+            
         }
         
-    }
-
-}
-
-
-extension SearchYoutubeVC: SongDelegate{
-    
-    func didSelectSong(at index: Int) {
         
-        //do st
     }
-    
-    
+
 }
+
 
 //MARK: - TableView Data Source
 
 extension SearchYoutubeVC: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        if isFull || self.listYoutube.count == 0{
+        if isFull{
             return 1
         }
         return 2
@@ -151,20 +123,15 @@ extension SearchYoutubeVC: UITableViewDataSource {
         
         if indexPath.section == 1 {
             
-            let cell = tableView.dequeueReusableCell(withIdentifier: "loadingCell", for: indexPath) as! LoadingTVCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: kLoadingCellId, for: indexPath) as! LoadingTVCell
             cell.indicator.startAnimating()
-            
-//            let vc = UIStoryboard(name: "Pager", bundle: nil).instantiateViewController(withIdentifier: "pageVC") as! SimpleViewController
-//            self.addChildViewController(vc)
-//            cell.addSubview(vc.view)
-            
             
             return cell
             
         }
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "songCell") as! SongTableViewCell
-        cell.updateContentYoutube(yt: listYoutube[indexPath.row])
+        cell.updateContentYoutube(listYoutube[indexPath.row])
         cell.index = indexPath.row
         cell.delegate = self
         
@@ -180,10 +147,10 @@ extension SearchYoutubeVC:UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-//        if indexPath.section == 1{
-//            return 500
-//        }
-        
+        if indexPath.section == 1{
+            return 50
+        }
+
         return 80
         
     }
@@ -196,9 +163,7 @@ extension SearchYoutubeVC:UITableViewDelegate {
         if offsetY > contentHeight - scrollView.frame.size.height {
             
             if !isFull && !isLoading{
-                
-//                searchRequest()
-                
+                searchRequest()
             }
             
         }
@@ -209,9 +174,20 @@ extension SearchYoutubeVC:UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 {
-            //open list recorded
+            return
         }
         
+    }
+    
+}
+
+//MARK: - Cell Delegate
+
+extension SearchYoutubeVC: SongDelegate{
+    
+    func didSelectSong(at index: Int) {
+        //do st
+        print(listYoutube[index].snippet?.title ?? "")
     }
     
 }

@@ -35,23 +35,14 @@ class SongTableViewCell: UITableViewCell {
         
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
-    
-    func updateContentYoutube(yt:Youtube){
+    func updateContentYoutube(_ obj:Items){
         
-        if  let singerAvatar = yt.thumbHigh ?? yt.thumbMedium ?? yt.thumbDefault {
-
-            imgThumb.kf.setImage(with: URL(string:singerAvatar),
-                                 placeholder:UIImage(named:"placeholder"))
+        if  let singerAvatar = obj.snippet?.thumbnails?.default?.url {
+            imgThumb.kf.setImage(with: URL(string:singerAvatar))
         }
         
-        lbTitle.text = yt.title
-        lbSinger.text = yt.channelTitle
+        lbTitle.text = obj.snippet?.title
+        lbSinger.text = obj.snippet?.channelTitle
 
         
     }

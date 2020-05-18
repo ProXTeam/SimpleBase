@@ -30,15 +30,15 @@ extension String {
     }
     
     func substring(from: Int) -> String {
-        return self[Range(min(from, length) ..< length)]
+        return self[min(from, length) ..< length]
     }
     
     func substring(to: Int) -> String {
-        return self[Range(0 ..< max(0, to))]
+        return self[0 ..< max(0, to)]
     }
     
     public func indexOfCharacter(_ char: Character) -> Int? {
-        if let idx = self.index(of: char) {
+        if let idx = self.firstIndex(of: char) {
             return self.distance(from: self.startIndex, to: idx)
         }
         
@@ -46,7 +46,7 @@ extension String {
     }
     
     func stringHeightWithMaxWidth(_ maxWidth: CGFloat, font: UIFont) -> CGFloat {
-        let attributes = [NSAttributedStringKey.font: font]
+        let attributes = [NSAttributedString.Key.font: font]
         let size: CGSize = self.boundingRect(
             with: CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
             options: NSStringDrawingOptions.usesLineFragmentOrigin,
@@ -59,7 +59,7 @@ extension String {
     
     func evaluateStringWidth(_ font: UIFont) -> CGFloat {
         //let font = UIFont.systemFontOfSize(15)
-        let attributes =  [NSAttributedStringKey.font: font]
+        let attributes =  [NSAttributedString.Key.font: font]
         let sizeOfText = self.size(withAttributes: (attributes))
         
         return sizeOfText.width
@@ -134,8 +134,8 @@ extension String {
     
     func toUnderlineMutableString(_ color: UIColor) -> NSMutableAttributedString {
         let mutableAtributeString = NSMutableAttributedString(attributedString: NSAttributedString(string: self))
-        mutableAtributeString.addAttribute(NSAttributedStringKey.underlineStyle, value: NSUnderlineStyle.styleDouble.rawValue, range: NSMakeRange(0, self.count))
-        mutableAtributeString.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: NSMakeRange(0, self.count))
+        mutableAtributeString.addAttribute(NSAttributedString.Key.underlineStyle, value: NSUnderlineStyle.double.rawValue, range: NSMakeRange(0, self.count))
+        mutableAtributeString.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSMakeRange(0, self.count))
         
         return mutableAtributeString
     }

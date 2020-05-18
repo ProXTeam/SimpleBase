@@ -24,7 +24,7 @@ public extension UIScreen {
     
     class var orientationSize: CGSize {
         let systemVersion = (UIDevice.current.systemVersion as NSString).floatValue
-        let isLand: Bool = UIInterfaceOrientationIsLandscape(UIApplication.shared.statusBarOrientation)
+        let isLand: Bool = UIApplication.shared.statusBarOrientation.isLandscape
         return (systemVersion > 8.0 && isLand) ? UIScreen.SwapSize(self.size) : self.size
     }
     

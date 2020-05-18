@@ -44,9 +44,9 @@ extension UIView {
         showIndicator(style: .gray)
     }
     
-    func showIndicator(style: UIActivityIndicatorViewStyle) {
+    func showIndicator(style: UIActivityIndicatorView.Style) {
         if self.viewWithTag(kTagIndicator) == nil {
-            let indicator = UIActivityIndicatorView(activityIndicatorStyle: style)
+            let indicator = UIActivityIndicatorView(style: style)
             indicator.tag = kTagIndicator
             
             self.addSubview(indicator)
