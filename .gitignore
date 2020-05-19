@@ -1,1 +1,10 @@
 Pods
+fastlane/screenshots/
+fastlane/DerivedData/
+fastlane/report.xml
+fastlane/metadata/
+*.app.dSYM.zip
+*.ipa
+Gemfile
+xcuserdata/
+.DS_Store
